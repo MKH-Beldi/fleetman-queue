@@ -37,6 +37,18 @@ pipeline {
                 }
             }
         }
+
+        stage('Push Docker image to Nexus Registry QA') {
+                    steps {
+                        script {
+                            docker.withRegistry( 'http://nexus-registry.eastus.cloudapp.azure.com:8088/', registryCredentials) {
+                                dockerImage.push("latest")
+                                dockerImage.push()
+                            }
+                        }
+                    }
+                }
+
         stage('Trigger K8S Manifest Updating') {
             steps {
                 build job: 'k8s-update-manifests-fleetman-queue', parameters: [string(name: 'DOCKERTAG', value: commit_id)]
